@@ -106,4 +106,24 @@ if ! grep -q 'zoxide init bash' ~/.bashrc; then
     echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
 fi
 
+# Add cd function to .bashrc (directory listing + zoxide tracking)
+if ! grep -q "my_bash_setup_cd_function" ~/.bashrc; then
+cat <<'EOF' >> ~/.bashrc
+
+# my_bash_setup_cd_function
+# Show a directory listing when using 'cd' (works with zoxide directory tracking)
+function cd() {
+    if declare -f __zoxide_cd &>/dev/null; then
+        __zoxide_cd "$@" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+    elif [ $# -eq 0 ]; then
+        builtin cd "${HOME}" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+    else
+        builtin cd "$@" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+    fi
+}
+EOF
+else
+    echo "cd function already in ~/.bashrc, skipping."
+fi
+
 echo "Done! Run 'source ~/.bashrc' or open a new terminal to apply changes."
