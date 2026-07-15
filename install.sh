@@ -114,11 +114,11 @@ cat <<'EOF' >> ~/.bashrc
 # Show a directory listing when using 'cd' (works with zoxide directory tracking)
 function cd() {
     if declare -f __zoxide_cd &>/dev/null; then
-        __zoxide_cd "$@" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+        __zoxide_cd "$@" && eza -lh --icons --total-size --time-style='+%d/%m/%Y'
     elif [ $# -eq 0 ]; then
-        builtin cd "${HOME}" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+        builtin cd "${HOME}" && eza -lh --icons --total-size --time-style='+%d/%m/%Y'
     else
-        builtin cd "$@" && /bin/ls -lhF --time-style='+%d/%m/%Y' --color=auto --ignore=lost+found
+        builtin cd "$@" && eza -lh --icons --total-size --time-style='+%d/%m/%Y'
     fi
 }
 EOF
