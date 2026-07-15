@@ -14,7 +14,9 @@ install_eza_apt() {
 }
 
 ##Install firacode nerdfont
-if ! fc-list | grep -qi "FiraCode"; then
+if compgen -G "/usr/share/fonts/FiraCodeNerdFont*.ttf" &>/dev/null || fc-list 2>/dev/null | grep -qi "FiraCode"; then
+    echo "FiraCode Nerd Font already installed, skipping."
+else
     if ! command -v unzip &> /dev/null; then
         if [ ! -f /etc/os-release ]; then
             echo "Cannot detect distro: /etc/os-release not found. Please install unzip manually."
@@ -29,10 +31,8 @@ if ! fc-list | grep -qi "FiraCode"; then
         esac
     fi
     wget -O /tmp/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip
-    sudo unzip /tmp/FiraCode.zip -d /usr/share/fonts/
+    sudo unzip -nq /tmp/FiraCode.zip -d /usr/share/fonts/
     sudo fc-cache -fv
-else
-    echo "FiraCode Nerd Font already installed, skipping."
 fi
 
 ## Install Starship
@@ -124,6 +124,38 @@ function cd() {
 EOF
 else
     echo "cd function already in ~/.bashrc, skipping."
+fi
+
+# Add extract function to .bashrc
+if ! grep -q "my_bash_setup_extract_function" ~/.bashrc; then
+cat <<'EOF' >> ~/.bashrc
+
+# my_bash_setup_extract_function
+function extract () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjvf $1    ;;
+      *.tar.gz)    tar xzvf $1    ;;
+      *.tar.xz)    tar xvf $1    ;;
+      *.bz2)       bzip2 -d $1    ;;
+      *.rar)       unrar2dir $1    ;;
+      *.gz)        gunzip $1    ;;
+      *.tar)       tar xf $1    ;;
+      *.tbz2)      tar xjf $1    ;;
+      *.tgz)       tar xzf $1    ;;
+      *.zip)       unzip2dir $1     ;;
+      *.Z)         uncompress $1    ;;
+      *.7z)        7z x $1    ;;
+      *.ace)       unace x $1    ;;
+      *)           echo "'$1' cannot be extracted via extract()"   ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+EOF
+else
+    echo "extract function already in ~/.bashrc, skipping."
 fi
 
 echo "Done! Run 'source ~/.bashrc' or open a new terminal to apply changes."
